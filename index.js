@@ -1,22 +1,48 @@
-const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey("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")
+const functions = require('@google-cloud/functions-framework');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 functions.http('helloHttp', (req, res) => {
-  const msg = {
-    to: 'wrospagnol@minha.fag.edu.br',
-    from: 'wrospagnol@minha.fag.edu.br',
-    subject: 'Sending with SendGrid is Fun',
-    text: 'and easy to do anywhere, even with Node.js',
-    html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+
+  if (req.method !== 'POST') {
+    return res.status(405).send('Método não permitido');
   }
+
+  const { toMail, content } = req.body;
+
+  if (!toMail || !content) {
+    return res.status(400).send('Campos "toMail" e "content" são obrigatórios');
+  }
+
+  const from = {
+    name: 'DonaFrost - Comida de mãe❄️',
+    email: 'wrospagnol@minha.fag.edu.br',
+  };
+
+  const to = {
+    name: 'Visitante do site',
+    email: toMail,
+  };
+
+  const subject = 'Contato cliente via site DonaFrost❄️';
+  const plainTextContent = content;
+
+  const msg = {
+    to: to.email,
+    from: from.email,
+    subject: subject,
+    text: plainTextContent,
+    html: `<strong>${plainTextContent}</strong>`,
+  };
 
   sgMail
     .send(msg)
-    .then(() => {
-      console.log('Email sent')
+    .then((response) => {
+      res.status(response[0].statusCode).send('Email enviado com sucesso!');
     })
     .catch((error) => {
-      console.error(error)
-    })
-
+      console.error('Erro ao enviar e-mail:', error);
+      res.status(500).send('Erro ao enviar o e-mail');
+    });
 });
