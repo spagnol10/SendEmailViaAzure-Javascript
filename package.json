@@ -1,0 +1,14 @@
+{
+  "name": "sendgrid",
+  "version": "1.0.0",
+  "description": "sendgridfunction",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "spagnol",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.4"
+  }
+}
